@@ -15,7 +15,7 @@ def predict_svm(model, X_test):
     """
     return model.predict(X_test)
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     import numpy as np
 
     # tiny fake dataset (just to prove it runs)
@@ -25,5 +25,5 @@ if __name__ == "__main__":
     model = train_svm(X_train, y_train, C=1)
     preds = predict_svm(model, X_train)
 
-    print("SVM ran ✅")
+    print("SVM ran ")
     print("preds:", preds)
