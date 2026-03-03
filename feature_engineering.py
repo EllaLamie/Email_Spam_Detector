@@ -32,7 +32,7 @@ def build_tfidf_features(
         labels,
         test_size=0.5,
         random_state=random_state,
-        stratify=None
+        stratify=labels
     )
 
     vectorizer = TfidfVectorizer(

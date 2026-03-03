@@ -1,5 +1,6 @@
 from feature_engineering import build_tfidf_features
 from models.svm import train_svm, predict_svm
+from sklearn.metrics import classification_report, accuracy_score
 
 texts = [
     "WIN a free iPhone now!!!",
@@ -18,3 +19,6 @@ preds = predict_svm(model, X_test)
 
 print("preds:", preds)
 print("y_test:", y_test)
+
+print("accuracy:", accuracy_score(y_test, preds))
+print(classification_report(y_test, preds, zero_division=0))
