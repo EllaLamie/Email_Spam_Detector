@@ -6,7 +6,7 @@ CS 450 – Artificial Intelligence Final Project
 - Ella Lamie
 - Steven
 - Trinh Ho
-- Kristine
+- Kristine Alba
 
 ## Project Overview
 This project performs a comparative analysis of multiple machine learning algorithms for email spam classification.
@@ -25,3 +25,4 @@ We will:
 - evaluation.py – Model comparison and metrics
 - app.py – Streamlit deployment
 - main.py – Training pipeline
+
