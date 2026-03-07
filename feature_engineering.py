@@ -8,13 +8,13 @@ Outputs:
 - vectorizer: fitted TF-IDF vectorizer
 """
 
-from typing import Tuple
+from typing import Iterable, Tuple
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
 
 def build_tfidf_features(
-    texts,
+    texts: Iterable[str],
     labels,
     test_size: float = 0.2,
     random_state: int = 42,
@@ -30,7 +30,7 @@ def build_tfidf_features(
     X_train_text, X_test_text, y_train, y_test = train_test_split(
         texts,
         labels,
-        test_size=0.5,
+        test_size=test_size,
         random_state=random_state,
         stratify=labels
     )
