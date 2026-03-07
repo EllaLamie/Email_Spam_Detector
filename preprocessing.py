@@ -10,3 +10,9 @@ def clean_text(text: str) -> str:
     text = re.sub(r"[^a-zA-Z\s]", " ", text)
     text = re.sub(r"\s+", " ", text).strip()
     return text
+
+def preprocess_dataframe(df: pd.DataFrame, text_column: str, label_column: str) -> pd.DataFrame:
+    df = df[[text_column, label_column]].copy()
+    df[text_column] = df[text_column].fillna("").apply(clean_text)
+    df = df[df[text_column].str.strip() != ""]
+    return df
