@@ -1,24 +1,45 @@
+import os
+import joblib
+import pandas as pd
+from sklearn.svm import LinearSVC
+from preprocessing import preprocess_dataframe
 from feature_engineering import build_tfidf_features
-from models.svm import train_svm, predict_svm
-from sklearn.metrics import classification_report, accuracy_score
+from evaluation import evaluate, print_evaluation
 
-texts = [
-    "WIN a free iPhone now!!!",
-    "Hey are we still meeting at 3?",
-    "Congratulations you won cash prize",
-    "Can you send me the homework?"
-]
-labels = [1, 0, 1, 0]  # 1=spam, 0=ham
+def main():
+    data_path = "spam.csv"
 
-X_train, X_test, y_train, y_test, vec = build_tfidf_features(
-    texts, labels, test_size=0.5
-)
+    if not os.path.exists(data_path):
+        raise FileNotFoundError("File not found")
+    df = pd.read_csv(data_path)
+    text_column = "message"
+    label_column = "label"
+    if text_column not in df.columns or label_column not in df.columns:
+        print("CSV must contain columns message and label")
+        print("Found columns: ", list(df.columns))
+        return
+    df = preprocess_dataframe(df, text_column=text_column, label_column=label_column)
+    texts = df[text_column]
+    labels = df[label_column]
 
-model = train_svm(X_train, y_train, C=1)
-preds = predict_svm(model, X_test)
+    X_train, X_text, y_train, y_test, vectorizer = build_tfidf_features(
+        texts,
+        labels,
+        test_size=0.2,
+        random_state=42,
+        max_features=20000,
+        ngram_range=(1,2),
+    )
 
-print("preds:", preds)
-print("y_test:", y_test)
+    model = LinearSVC()
+    model.fit(X_train, y_train)
 
-print("accuracy:", accuracy_score(y_test, preds))
-print(classification_report(y_test, preds, zero_division=0))
+    results = evaluate(model, X_text, y_test)
+    print_evaluation(results)
+    os.makedirs("results", exist_ok=True)
+    joblib.dump(model, "models/spam_model.pkl")
+    joblib.dump(vectorizer, "models/tfidf_vectorizer.pkl")
+    print("Saved model and vectorizer: models/spam_model.pkl and models/tfidf_vectorizer.pkl")
+
+    if __name__ == "__main__":
+        main()
