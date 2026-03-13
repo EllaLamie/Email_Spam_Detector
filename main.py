@@ -2,6 +2,14 @@ import os
 import joblib
 import pandas as pd
 from sklearn.svm import LinearSVC
+# -------------------------------------------------------
+# CHANGE:
+# Added imports for additional baseline models
+# These models were added as part of the project task:
+# Naive Bayes + Logistic Regression Implementation
+# -------------------------------------------------------
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
 from preprocessing import preprocess_dataframe
 from feature_engineering import build_tfidf_features
 from evaluation import evaluate, print_evaluation
@@ -22,7 +30,11 @@ def main():
     texts = df[text_column]
     labels = df[label_column]
 
-    X_train, X_text, y_train, y_test, vectorizer = build_tfidf_features(
+    # NOTE:
+    # The variable name returned by build_tfidf_features is X_test.
+    # The previous code used X_text which would cause a runtime error.
+    # Corrected here to use X_test.
+    X_train, X_test, y_train, y_test, vectorizer = build_tfidf_features(
         texts,
         labels,
         test_size=0.2,
@@ -31,15 +43,54 @@ def main():
         ngram_range=(1,2),
     )
 
-    model = LinearSVC()
-    model.fit(X_train, y_train)
+    # -------------------------------------------------------
+    # CHANGE:
+    # Added Naive Bayes and Logistic Regression models
+    # -------------------------------------------------------
 
-    results = evaluate(model, X_text, y_test)
+    models = {
+        "SVM": LinearSVC(),
+        "NaiveBayes": MultinomialNB(),
+        "LogisticRegression": LogisticRegression(max_iter=1000)
+    }
+
+    trained_models = {}
+
+    for name, model in models.items():
+        print(f"\nTraining {name}...")
+
+        model.fit(X_train, y_train)
+
+        results = evaluate(model, X_test, y_test)
+
+        print(f"\n{name} Results:")
+        print_evaluation(results)
+
+        trained_models[name] = model
+
+    # NOTE:
+    # Same here; changing X_text to X_test
+    # But if it was intentional, feel free to revert, all I did was 
+    # Change X_text to X_test.
+    results = evaluate(model, X_test, y_test)
     print_evaluation(results)
     os.makedirs("results", exist_ok=True)
-    joblib.dump(model, "models/spam_model.pkl")
+
+    # -------------------------------------------------------
+    # CHANGE:
+    # Saving trained Naive Bayes and Logistic Regression models here
+    # -------------------------------------------------------
+    joblib.dump(trained_models["SVM"], "models/spam_model.pkl")
+    joblib.dump(trained_models["NaiveBayes"], "models/naive_bayes_model.pkl")
+    joblib.dump(trained_models["LogisticRegression"], "models/logistic_regression_model.pkl")
+
     joblib.dump(vectorizer, "models/tfidf_vectorizer.pkl")
-    print("Saved model and vectorizer: models/spam_model.pkl and models/tfidf_vectorizer.pkl")
+
+    print("Saved model and vectorizer:")
+    print(" - models/spam_model.pkl (SVM used by app)")
+    print(" - models/naive_bayes_model.pkl")
+    print(" - models/logistic_regression_model.pkl")
+    print(" - models/tfidf_vectorizer.pkl")
 
     if __name__ == "__main__":
         main()
