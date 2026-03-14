@@ -19,4 +19,4 @@ if st.button("Predict"):
         if prediction == "spam":
             st.error("Email is predicted to not be spam")
         else:
-            st.success("Email is predicted to be spam")
+            st.success("Email is predicted to not be spam") # added not instead 

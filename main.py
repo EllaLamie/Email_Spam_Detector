@@ -92,5 +92,5 @@ def main():
     print(" - models/logistic_regression_model.pkl")
     print(" - models/tfidf_vectorizer.pkl")
 
-    if __name__ == "__main__":
-        main()
+if __name__ == "__main__": # this needs to be alined with th main()
+    main()
