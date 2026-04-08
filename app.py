@@ -1,22 +1,45 @@
-import joblib
 import streamlit as st
+import joblib
 from preprocessing import clean_text
 
+# Load model and vectorizer
 model = joblib.load("models/spam_model.pkl")
 vectorizer = joblib.load("models/tfidf_vectorizer.pkl")
-st.title("Email Spam Detector")
-st.write("Paste your email below to check if it is spam")
-user_input = st.text_area("Enter your email:")
 
-if st.button("Predict"):
-    if user_input.strip() == "":
-        st.warning("Please enter your email")
+# Page settings
+st.set_page_config(
+    page_title="Email Spam Detector",
+    page_icon="📧",
+    layout="centered"
+)
+
+# Title
+st.title("📧 Email Spam Detector")
+st.write("Paste an email below and I'll predict whether it's spam or not.")
+
+# Input box
+email_text = st.text_area(
+    "Enter email text:",
+    height=200,
+    placeholder="Example: Congratulations! You've won a free iPhone..."
+)
+
+# Predict button
+if st.button("Check Email"):
+    if email_text.strip() == "":
+        st.warning("Please enter some email text first.")
     else:
-        cleaned_text = clean_text(user_input)
-        text_features = vectorizer.transform([cleaned_text])
-        prediction = model.predict(text_features)[0]
+        # Clean text
+        cleaned_text = clean_text(email_text)
 
+        # Convert to TF-IDF
+        features = vectorizer.transform([cleaned_text])
+
+        # Predict
+        prediction = model.predict(features)[0]
+
+        # Show result
         if prediction == "spam":
-            st.error("Email is predicted to not be spam")
+            st.error("🚨 This email looks like SPAM.")
         else:
-            st.success("Email is predicted to not be spam") # added not instead 
+            st.success("This email looks safe (not spam).")
