@@ -12,7 +12,7 @@ from typing import Iterable, Tuple
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 
-
+# Split dataset into train and test and converts text into numbers
 def build_tfidf_features(
     texts: Iterable[str],
     labels,
@@ -34,15 +34,16 @@ def build_tfidf_features(
         random_state=random_state,
         stratify=labels
     )
-
+    # Create the vectorizer to turn text into numbers
     vectorizer = TfidfVectorizer(
         lowercase=True,
         stop_words="english",
         max_features=max_features,
         ngram_range=ngram_range
     )
-
+    # The vectorizer learns the words in training data and converts them to numbers
     X_train = vectorizer.fit_transform(X_train_text)
+    # The vectorizer converts words into numbers on test data
     X_test = vectorizer.transform(X_test_text)
 
     return X_train, X_test, y_train, y_test, vectorizer

@@ -16,17 +16,22 @@ from evaluation import evaluate, print_evaluation
 
 def main():
     data_path = "spam.csv"
-
+    # Make sure the file exists
     if not os.path.exists(data_path):
         raise FileNotFoundError("File not found")
+    # Read file
     df = pd.read_csv(data_path)
+    # Set text column to email and label column to label
     text_column = "message"
     label_column = "label"
+    # Error check if either of message or label do not work
     if text_column not in df.columns or label_column not in df.columns:
         print("CSV must contain columns message and label")
         print("Found columns: ", list(df.columns))
         return
+    # Clean emails
     df = preprocess_dataframe(df, text_column=text_column, label_column=label_column)
+    # Get texts and labels from the corresponding columns
     texts = df[text_column]
     labels = df[label_column]
 
@@ -34,6 +39,8 @@ def main():
     # The variable name returned by build_tfidf_features is X_test.
     # The previous code used X_text which would cause a runtime error.
     # Corrected here to use X_test.
+
+    # Convert text into numbers (TF-IDF)
     X_train, X_test, y_train, y_test, vectorizer = build_tfidf_features(
         texts,
         labels,
@@ -47,7 +54,7 @@ def main():
     # CHANGE:
     # Added Naive Bayes and Logistic Regression models
     # -------------------------------------------------------
-
+    # Model is set
     models = {
         "SVM": LinearSVC(),
         "NaiveBayes": MultinomialNB(),
@@ -58,14 +65,12 @@ def main():
 
     for name, model in models.items():
         print(f"\nTraining {name}...")
-
+        # Model can learn patterns
         model.fit(X_train, y_train)
-
+        # Print the results
         results = evaluate(model, X_test, y_test)
-
         print(f"\n{name} Results:")
         print_evaluation(results)
-
         trained_models[name] = model
 
     # NOTE:
@@ -80,10 +85,10 @@ def main():
     # CHANGE:
     # Saving trained Naive Bayes and Logistic Regression models here
     # -------------------------------------------------------
+    # Saves trained model and vectorizer for TF-IDF
     joblib.dump(trained_models["SVM"], "models/spam_model.pkl")
     joblib.dump(trained_models["NaiveBayes"], "models/naive_bayes_model.pkl")
     joblib.dump(trained_models["LogisticRegression"], "models/logistic_regression_model.pkl")
-
     joblib.dump(vectorizer, "models/tfidf_vectorizer.pkl")
 
     print("Saved model and vectorizer:")
@@ -92,5 +97,5 @@ def main():
     print(" - models/logistic_regression_model.pkl")
     print(" - models/tfidf_vectorizer.pkl")
 
-if __name__ == "__main__": # this needs to be alined with th main()
+if __name__ == "__main__": # this needs to be aligned with the main()
     main()
